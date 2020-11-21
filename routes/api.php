@@ -23,4 +23,6 @@ Route::get('/get-tvshows', 'SpaController@getTvShows');
 Route::get('/get-categories', 'SpaController@getCategories');
 Route::get('/get-status', 'SpaController@getStatus');
 Route::get('/get-years', 'SpaController@getYear');
+Route::post('/save-tvshow', 'SpaController@saveTvshow');
+Route::delete('/delete-tvshow/{id}', 'SpaController@destroy');
 

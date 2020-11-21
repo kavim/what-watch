@@ -39,16 +39,29 @@ export default new Vuex.Store({
         let found = state.tvshows.find(ts => ts.id == tvshow.id );
 
         if(found){
-
-            found = tvshow;
+            
+            found.name = tvshow.name;
+            found.category_id = tvshow.category_id;
+            found.seasons_quantity = tvshow.seasons_quantity;
+            found.status_id = tvshow.status_id;
+            found.synopsis = tvshow.synopsis;
+            found.year = tvshow.year;
 
         }else{
 
           state.tvshows.push(tvshow);
 
         }
-
       },
+      delete_tvshow(state, id){
+        let found = state.tvshows.find(ts => ts.id == id );
+        const index = state.tvshows.indexOf(found);
+
+        if (index > -1) {
+            state.tvshows.splice(index, 1);
+        }
+
+      }
       
     },
     actions: {
@@ -98,6 +111,11 @@ export default new Vuex.Store({
         commit('save_tvShow', tvshow);
         
       },
+      deleteTvShow({ commit }, id){
+
+        commit('delete_tvshow', id);
+
+      }
 
     },
 

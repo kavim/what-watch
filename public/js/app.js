@@ -1933,10 +1933,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      loading: true
+      loading: true,
+      to_update: {},
+      to_update_id: 0,
+      updating: false
     };
   },
   created: function created() {
@@ -1954,6 +1971,35 @@ __webpack_require__.r(__webpack_exports__);
         _this.$store.dispatch("getYears");
 
         _this.loading = false;
+      });
+    },
+    addTvshow: function addTvshow() {
+      this.updating = false;
+      this.to_update = {};
+      this.to_update_id = 0;
+      $('#modal').modal('toggle');
+    },
+    editTvShow: function editTvShow(ts) {
+      this.updating = true;
+      this.to_update = ts;
+      this.to_update_id = ts.id;
+      $('#exampleModal').modal({
+        backdrop: 'static',
+        keyboard: false
+      });
+    },
+    deleteTvShow: function deleteTvShow(ts) {
+      var that = this;
+      axios["delete"]('/api/delete-tvshow/' + ts.id, {
+        tvshow: ts
+      }).then(function (response) {
+        if (response.status != 200) {
+          return new Error("Something went wrong");
+        }
+
+        that.$store.dispatch("deleteTvShow", ts.id);
+      })["catch"](function (error) {
+        alert(error);
       });
     }
   },
@@ -2020,34 +2066,86 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    updating: {
+      type: Boolean
+    },
+    to_update: {
+      type: [Object, Array]
+    },
+    to_update_id: {
+      type: Number
+    }
+  },
   data: function data() {
     return _defineProperty({
       id: 0,
       name: '',
       year: null,
       synopsis: '',
-      season_qty: null,
+      seasons_quantity: null,
       category_id: 0,
-      status_id: 0
+      status_id: 1
     }, "year", 0);
   },
   methods: {
     submit: function submit() {
-      var ts = _defineProperty({
-        id: 0,
+      var ts = {
+        id: this.id,
         name: this.name,
         year: this.year,
         synopsis: this.synopsis,
-        season_qty: this.season_qty,
+        seasons_quantity: this.seasons_quantity,
         category_id: this.category_id,
         status_id: this.status_id
-      }, "year", this.year);
+      };
+      var that = this;
+      axios.post('/api/save-tvshow', {
+        tvshow: ts
+      }).then(function (response) {
+        if (response.status != 200 || !response.data.status) {
+          return new Error("Something went wrong");
+        }
 
-      this.$store.dispatch("saveTvShow", ts);
+        that.$store.dispatch("saveTvShow", response.data.tvshow);
+        $('#modal').modal('toggle');
+      })["catch"](function (error) {
+        alert(error);
+        alert("not ok");
+      });
+    },
+    syncData: function syncData() {
+      if (this.updating) {
+        this.id = this.to_update.id, this.name = this.to_update.name, this.year = this.to_update.year, this.synopsis = this.to_update.synopsis, this.seasons_quantity = this.to_update.seasons_quantity, this.category_id = this.to_update.category_id, this.status_id = this.to_update.status_id, this.year = this.to_update.year;
+        console.log("this.to_update");
+      } else {
+        this.id = 0, this.name = '', this.year = null, this.synopsis = '', this.seasons_quantity = null, this.category_id = 0, this.status_id = 0, this.year = 0;
+        console.log("add ts");
+      }
     }
   },
-  mounted: function mounted() {},
+  watch: {
+    updating: function updating() {
+      this.syncData();
+    },
+    to_update_id: function to_update_id() {
+      this.syncData();
+    }
+  },
   computed: {
     categoriesAs: function categoriesAs() {
       var retorno = [];
@@ -37664,45 +37762,112 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "container" },
-    [
-      _c("h1", [_vm._v("Lista de series")]),
-      _vm._v("\n    " + _vm._s(_vm.listTvShow) + "\n    "),
-      _c("br"),
-      _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _c("tvshow"),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "row" },
-        _vm._l(_vm.listTvShow, function(tvshow, index) {
-          return _c(
+  return _c("div", { staticClass: "container" }, [
+    _c("h1", [_vm._v("Lista de series")]),
+    _vm._v("\n    " + _vm._s(_vm.listTvShow) + "\n    "),
+    _c("br"),
+    _vm._v(" "),
+    _c("br"),
+    _vm._v(" "),
+    _c("br"),
+    _vm._v(" "),
+    _c("br"),
+    _vm._v(" "),
+    _c("br"),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-outline-success",
+        attrs: { type: "button" },
+        on: { click: _vm.addTvshow }
+      },
+      [_vm._v("Novo")]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade bd-example-modal-lg",
+        attrs: {
+          id: "modal",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "myLargeModalLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c("div", { staticClass: "modal-dialog modal-lg" }, [
+          _c(
             "div",
-            { key: index, staticClass: "col-12 border rounded my-2 p-4" },
+            { staticClass: "modal-content" },
             [
-              _c("div", { staticClass: "row" }, [
-                _c("div", { staticClass: "col-6" }, [
-                  _c("strong", [_vm._v(_vm._s(tvshow.name))])
-                ])
-              ])
-            ]
+              _c("tvshow", {
+                attrs: {
+                  to_update: this.to_update,
+                  updating: this.updating,
+                  to_update_id: this.to_update_id
+                }
+              })
+            ],
+            1
           )
-        }),
-        0
-      )
-    ],
-    1
-  )
+        ])
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "row" },
+      _vm._l(_vm.listTvShow, function(tvshow, index) {
+        return _c(
+          "div",
+          { key: index, staticClass: "col-12 border rounded my-2 p-4" },
+          [
+            _c("div", { staticClass: "row" }, [
+              _c("div", { staticClass: "col-6" }, [
+                _c("strong", [_vm._v(_vm._s(tvshow.name))]),
+                _vm._v(" "),
+                _c("span", [_vm._v(_vm._s(tvshow.year))])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-6 text-right" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-outline-primary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.editTvShow(tvshow)
+                      }
+                    }
+                  },
+                  [_vm._v("edit")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-outline-danger",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.deleteTvShow(tvshow)
+                      }
+                    }
+                  },
+                  [_vm._v("del")]
+                )
+              ])
+            ])
+          ]
+        )
+      }),
+      0
+    )
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -37727,7 +37892,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "row justify-content-center" }, [
-    _c("div", { staticClass: "col-8" }, [
+    _c("div", { staticClass: "col-8 m-3" }, [
       _c("div", { staticClass: "form-group" }, [
         _c("label", { attrs: { for: "Nameson" } }, [_vm._v("Nameson  ")]),
         _vm._v(" "),
@@ -37784,28 +37949,26 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "form-row" }, [
         _c("div", { staticClass: "form-group col-md-4" }, [
-          _c("label", { attrs: { for: "sq" } }, [
-            _vm._v("Quantidade de temporadas")
-          ]),
+          _c("label", { attrs: { for: "sq" } }, [_vm._v("N.º de temporadas")]),
           _vm._v(" "),
           _c("input", {
             directives: [
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.season_qty,
-                expression: "season_qty"
+                value: _vm.seasons_quantity,
+                expression: "seasons_quantity"
               }
             ],
             staticClass: "form-control",
             attrs: { type: "number", id: "sq" },
-            domProps: { value: _vm.season_qty },
+            domProps: { value: _vm.seasons_quantity },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.season_qty = $event.target.value
+                _vm.seasons_quantity = $event.target.value
               }
             }
           })
@@ -37857,6 +38020,8 @@ var render = function() {
                     _vm._v(
                       "\n                            " +
                         _vm._s(option.text) +
+                        "\n                            " +
+                        _vm._s(option.id) +
                         "\n                        "
                     )
                   ]
@@ -37921,6 +38086,78 @@ var render = function() {
             ],
             2
           )
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group col-md-6 mx-auto my-2" }, [
+          _c("div", { staticClass: "radio-btn-group" }, [
+            _c(
+              "div",
+              {
+                staticClass: "radio",
+                on: {
+                  click: function($event) {
+                    _vm.status_id = 1
+                  }
+                }
+              },
+              [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: this.status_id,
+                      expression: "this.status_id"
+                    }
+                  ],
+                  attrs: { type: "radio" },
+                  domProps: { value: 1, checked: _vm._q(this.status_id, 1) },
+                  on: {
+                    change: function($event) {
+                      return _vm.$set(this, "status_id", 1)
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c("label", { attrs: { for: "click_me" } }, [
+                  _vm._v("Já assisti")
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticClass: "radio",
+                on: {
+                  click: function($event) {
+                    _vm.status_id = 2
+                  }
+                }
+              },
+              [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: this.status_id,
+                      expression: "this.status_id"
+                    }
+                  ],
+                  attrs: { type: "radio" },
+                  domProps: { value: 2, checked: _vm._q(this.status_id, 2) },
+                  on: {
+                    change: function($event) {
+                      return _vm.$set(this, "status_id", 2)
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c("label", { attrs: { for: "or_me" } }, [_vm._v("Quero VER")])
+              ]
+            )
+          ])
         ])
       ]),
       _vm._v(" "),
@@ -51630,9 +51867,24 @@ var years = window.localStorage.getItem('years');
       });
 
       if (found) {
-        found = tvshow;
+        found.name = tvshow.name;
+        found.category_id = tvshow.category_id;
+        found.seasons_quantity = tvshow.seasons_quantity;
+        found.status_id = tvshow.status_id;
+        found.synopsis = tvshow.synopsis;
+        found.year = tvshow.year;
       } else {
         state.tvshows.push(tvshow);
+      }
+    },
+    delete_tvshow: function delete_tvshow(state, id) {
+      var found = state.tvshows.find(function (ts) {
+        return ts.id == id;
+      });
+      var index = state.tvshows.indexOf(found);
+
+      if (index > -1) {
+        state.tvshows.splice(index, 1);
       }
     }
   },
@@ -51677,6 +51929,10 @@ var years = window.localStorage.getItem('years');
     saveTvShow: function saveTvShow(_ref5, tvshow) {
       var commit = _ref5.commit;
       commit('save_tvShow', tvshow);
+    },
+    deleteTvShow: function deleteTvShow(_ref6, id) {
+      var commit = _ref6.commit;
+      commit('delete_tvshow', id);
     }
   }
 }));

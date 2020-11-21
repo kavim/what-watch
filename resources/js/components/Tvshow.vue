@@ -1,6 +1,6 @@
 <template>
     <div class="row justify-content-center">
-        <div class="col-8">
+        <div class="col-8 m-3">
             <!-- <form> -->
                 <div class="form-group">
                     <label for="Nameson">Nameson  </label>
@@ -12,8 +12,8 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-4">
-                        <label for="sq">Quantidade de temporadas</label>
-                        <input v-model="season_qty" type="number" class="form-control" id="sq">
+                        <label for="sq">N.º de temporadas</label>
+                        <input v-model="seasons_quantity" type="number" class="form-control" id="sq">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="sq">Categoria</label>
@@ -21,6 +21,7 @@
                             <option disabled hidden value="0">Categoria</option>
                             <option v-for="option in categoriesAs" v-bind:value="option.value" :key="option.value">
                                 {{ option.text }}
+                                {{ option.id }}
                             </option>
                         </select>
                     </div>
@@ -33,6 +34,18 @@
                             </option>
                         </select>
                     </div>
+                    <div class="form-group col-md-6 mx-auto my-2">
+                        <div class="radio-btn-group">
+                            <div class="radio" @click="status_id = 1">
+                                <input v-model="this.status_id" type="radio" :value="1">
+                                <label for="click_me">Já assisti</label>
+                            </div>
+                            <div class="radio" @click="status_id = 2">
+                                <input v-model="this.status_id" type="radio" :value="2">
+                                <label for="or_me">Quero VER</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <button @click="submit" type="submit" class="btn btn-outline-dark">DALE</button>
             <!-- </form> -->
@@ -43,35 +56,102 @@
 
 <script>
     export default {
+        props: {
+            updating: {
+                type: Boolean,
+            },
+            to_update: {
+                type: [Object, Array],
+            },
+            to_update_id: {
+                type: Number,
+            },
+        },
         data() {
             return {
                 id: 0,
                 name: '',
                 year: null,
                 synopsis: '',
-                season_qty: null,
+                seasons_quantity: null,
                 category_id: 0,
-                status_id: 0,
+                status_id: 1,
                 year: 0
             }
         },
         methods: {
             submit: function(){
                 let ts = {
-                    id: 0,
+                    id: this.id,
                     name: this.name,
                     year: this.year,
                     synopsis: this.synopsis,
-                    season_qty: this.season_qty,
+                    seasons_quantity: this.seasons_quantity,
                     category_id: this.category_id,
                     status_id: this.status_id,
-                    year: this.year
                 }
 
-                this.$store.dispatch("saveTvShow", ts);
+                let that = this;
+                
+                axios.post('/api/save-tvshow', {
+                    tvshow: ts
+                })
+                .then(function (response) {
+                    
+                    if (response.status != 200 || !response.data.status) {
+                        
+                        return new Error("Something went wrong");
+
+                    }
+
+                    that.$store.dispatch("saveTvShow", response.data.tvshow);
+
+                    $('#modal').modal('toggle');
+
+                })
+                .catch(function (error) {
+                    alert(error);
+                    alert("not ok");
+                });
+            },
+            syncData(){
+                if(this.updating){
+                    
+                    this.id = this.to_update.id,
+                    this.name= this.to_update.name,
+                    this.year= this.to_update.year,
+                    this.synopsis= this.to_update.synopsis,
+                    this.seasons_quantity= this.to_update.seasons_quantity,
+                    this.category_id= this.to_update.category_id,
+                    this.status_id= this.to_update.status_id,
+                    this.year= this.to_update.year
+
+                    console.log("this.to_update");
+                    
+                }else{
+
+                    this.id = 0,
+                    this.name= '',
+                    this.year= null,
+                    this.synopsis= '',
+                    this.seasons_quantity= null,
+                    this.category_id= 0,
+                    this.status_id= 0,
+                    this.year= 0
+
+                    console.log("add ts");
+
+                }
             }
         },
-        mounted() {
+        watch: {
+
+            updating: function(){
+                this.syncData();
+            },
+            to_update_id: function(){
+                this.syncData();
+            }
             
         },
         computed: {

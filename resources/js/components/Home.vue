@@ -35,7 +35,9 @@
             </div>
         </div>
         <div v-else class="row">
-            <h3>Nenhuma serie</h3>
+            <div class="col-12 text-white text-center p-5">
+                <h3>Nenhuma serie cadastrada</h3>
+            </div>
         </div>
         
         <div id="modal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">

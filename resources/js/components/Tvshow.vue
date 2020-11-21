@@ -25,7 +25,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-4">
                         <label for="sq">N.º de temporadas</label>
-                        <input v-model="seasons_quantity" type="number" class="form-control" id="sq" min="1" :max="50" placeholder="minimo 1">
+                        <input @input="seasons_quantity_filter" :value="seasons_quantity" type="number" class="form-control" id="sq"  placeholder="minimo 1">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="sq">Categoria</label>
@@ -49,12 +49,6 @@
                 </div>
                 
             <!-- </form> -->
-        </div>
-
-        <div v-if="errorMsg != null" class="col-11 text-right mt-4">
-            <div class="alert alert-danger" role="alert">
-                {{this.errorMsg}}
-            </div>            
         </div>
         
         <div class="col-11 text-right mt-4">
@@ -88,7 +82,6 @@
                 category_id: 0,
                 status_id: 1,
                 year: 0,
-                errorMsg: null
             }
         },
         methods: {
@@ -108,7 +101,6 @@
                 }else{
                     this.updateTvshow(ts);
                 }
-
                 
             },
             storeTvshow(ts){
@@ -118,10 +110,9 @@
                     tvshow: ts
                 })
                 .then(function (response) {
+                    console.log(response);
+
                     if (response.status != 200 || !response.data.status) {   
-                        
-                        this.errorMsg = response.data.response.seasons_quantity;
-                        
                         return new Error("Something went wrong");
                     }
 
@@ -132,7 +123,6 @@
                 })
                 .catch(function (error) {
                     alert(error);
-                    this.errorMsg = error;
                 });
             },
             updateTvshow(ts){
@@ -181,11 +171,11 @@
 
                 }
             },
-            updateValue(event) {
+            seasons_quantity_filter(event) {
                 const value = event.target.value
                 console.log(value, this.amount)
-                    if (String(value).length <= 10) {
-                        this.amount = value
+                    if (String(value).length <= 2) {
+                        this.seasons_quantity = value
                     }
                 this.$forceUpdate()
             }

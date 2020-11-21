@@ -1967,6 +1967,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2107,12 +2109,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     updating: {
@@ -2126,9 +2122,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   data: function data() {
-    var _ref;
-
-    return _ref = {
+    return _defineProperty({
       id: 0,
       name: '',
       year: null,
@@ -2136,7 +2130,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       seasons_quantity: null,
       category_id: 0,
       status_id: 1
-    }, _defineProperty(_ref, "year", 0), _defineProperty(_ref, "errorMsg", null), _ref;
+    }, "year", 0);
   },
   methods: {
     submit: function submit() {
@@ -2161,8 +2155,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       axios.post('/api/save-tvshow', {
         tvshow: ts
       }).then(function (response) {
+        console.log(response);
+
         if (response.status != 200 || !response.data.status) {
-          this.errorMsg = response.data.response.seasons_quantity;
           return new Error("Something went wrong");
         }
 
@@ -2170,7 +2165,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         $('#modal').modal('toggle');
       })["catch"](function (error) {
         alert(error);
-        this.errorMsg = error;
       });
     },
     updateTvshow: function updateTvshow(ts) {
@@ -2209,12 +2203,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.year = 0;
       }
     },
-    updateValue: function updateValue(event) {
+    seasons_quantity_filter: function seasons_quantity_filter(event) {
       var value = event.target.value;
       console.log(value, this.amount);
 
-      if (String(value).length <= 10) {
-        this.amount = value;
+      if (String(value).length <= 2) {
+        this.seasons_quantity = value;
       }
 
       this.$forceUpdate();
@@ -37960,9 +37954,7 @@ var render = function() {
           }),
           0
         )
-      : _c("div", { staticClass: "row" }, [
-          _c("h3", [_vm._v("Nenhuma serie")])
-        ]),
+      : _c("div", { staticClass: "row" }, [_vm._m(1)]),
     _vm._v(" "),
     _c(
       "div",
@@ -37979,7 +37971,7 @@ var render = function() {
       [
         _c("div", { staticClass: "modal-dialog modal-lg" }, [
           _c("div", { staticClass: "modal-content" }, [
-            _vm._m(1),
+            _vm._m(2),
             _vm._v(" "),
             _c(
               "div",
@@ -38009,6 +38001,14 @@ var staticRenderFns = [
     return _c("h1", [
       _c("i", { staticClass: "fas fa-swatchbook" }),
       _vm._v(" Lista de series")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-12 text-white text-center p-5" }, [
+      _c("h3", [_vm._v("Nenhuma serie cadastrada")])
     ])
   },
   function() {
@@ -38200,31 +38200,10 @@ var render = function() {
           _c("label", { attrs: { for: "sq" } }, [_vm._v("N.º de temporadas")]),
           _vm._v(" "),
           _c("input", {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.seasons_quantity,
-                expression: "seasons_quantity"
-              }
-            ],
             staticClass: "form-control",
-            attrs: {
-              type: "number",
-              id: "sq",
-              min: "1",
-              max: 50,
-              placeholder: "minimo 1"
-            },
+            attrs: { type: "number", id: "sq", placeholder: "minimo 1" },
             domProps: { value: _vm.seasons_quantity },
-            on: {
-              input: function($event) {
-                if ($event.target.composing) {
-                  return
-                }
-                _vm.seasons_quantity = $event.target.value
-              }
-            }
+            on: { input: _vm.seasons_quantity_filter }
           })
         ]),
         _vm._v(" "),
@@ -38345,16 +38324,6 @@ var render = function() {
         ])
       ])
     ]),
-    _vm._v(" "),
-    _vm.errorMsg != null
-      ? _c("div", { staticClass: "col-11 text-right mt-4" }, [
-          _c(
-            "div",
-            { staticClass: "alert alert-danger", attrs: { role: "alert" } },
-            [_vm._v("\n            " + _vm._s(this.errorMsg) + "\n        ")]
-          )
-        ])
-      : _vm._e(),
     _vm._v(" "),
     _c("div", { staticClass: "col-11 text-right mt-4" }, [
       _c(

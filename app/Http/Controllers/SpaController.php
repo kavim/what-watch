@@ -139,7 +139,7 @@ class SpaController extends Controller
                 'year' => 'required|integer|min:1901',
                 'category_id' => 'required|integer|min:1',
                 'status_id' => 'required|integer|min:1',
-                'seasons_quantity' => 'integer|min:1|max:80',
+                'seasons_quantity' => 'integer|min:1|max:99',
             ]
         );
 

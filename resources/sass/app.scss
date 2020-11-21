@@ -1,11 +1,32 @@
 // Fonts
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 
+//fontawesome stuff
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/solid";
+@import "~@fortawesome/fontawesome-free/scss/brands";
+@import "~@fortawesome/fontawesome-free/scss/regular";
+
 // Variables
 @import 'variables';
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background-image: linear-gradient(90deg, rgba(44,118,154,1) 0%, rgba(80,185,207,1) 100%);
+  font-family: "Poppins", sans-serif;
+  min-height: 100vh;
+}
+
+.ts_title {
+  font-size: 23px;
+}
 
 .radio-btn-group {
     display: flex;

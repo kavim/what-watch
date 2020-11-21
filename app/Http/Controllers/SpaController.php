@@ -12,12 +12,6 @@ use Illuminate\Support\Facades\Validator;
 
 class SpaController extends Controller
 {
-    public function index()
-    {
-        return view('index');
-    }
-
-
 
     public function getTvShows()
     {
@@ -28,8 +22,6 @@ class SpaController extends Controller
         $tvShows = array();
 
         $tvshowtable = \App\TvShow::orderBy('name')->get();
-
-        // \Log::info($tvshowtable);
 
         if($tvshowtable){
             foreach ($tvshowtable as $key => $ts) {
@@ -95,35 +87,6 @@ class SpaController extends Controller
 
     public function update($request)
     {   
-        // $tvShow = false;
-
-        // try {
-
-        //     $tvShow = \App\TvShow::findOrFail($request['id']);
-
-        //     $tvShow->update(
-        //         [
-        //             'name' => $request['name'],
-        //             'year' => $request['year'],
-        //             'synopsis' => $request['synopsis'],
-        //             'seasons_quantity' => $request['seasons_quantity'],
-        //             'category_id' => $request['category_id'],
-        //             'status_id' => $request['status_id']
-        //         ]
-        //     );
-
-        // } catch (ModelNotFoundException $th) {
-            
-        //     \Log::info($th);
-
-        //     throw $th;
-
-        // } finally {
-
-        //     return $tvShow;
-
-        // }
-        
         $tvShow = false;
 
         $tvShow = \App\TvShow::findOrFail($request['id']);
@@ -146,34 +109,6 @@ class SpaController extends Controller
     public function create($request)
     {
         $tvShow = false;
-        
-        // try {
-        //     $tvShow = \App\TvShow::create(
-        //         [
-        //             'name' => $request['name'],
-        //             'year' => $request['year'],
-        //             'synopsis' => $request['synopsis'],
-        //             'seasons_quantity' => $request['seasons_quantity'],
-        //             'category_id' => $request['category_id'],
-        //             'status_id' => $request['status_id']
-        //         ]
-        //     );
-
-        //     return $tvShow;
-
-        // } catch (CreateTvShowsTable $th) {
-            
-        //     \Log::info($th);
-
-        //     throw $th;
-
-        // } finally {
-
-        //     return $tvShow;
-            
-        // }
-
-        // return $tvShow;
 
         $tvShow = \App\TvShow::create(
             [
@@ -192,47 +127,10 @@ class SpaController extends Controller
 
     public function saveTvshow(Request $request)
     {   
-
-        // $return = [
-        //     'status' => false,
-        //     'tvshow' => $tvShow = []
-        // ];
-
-        // try {
-
-        //     if($request->id != 0){
-        //         $tvShow = $this->update($request);
-        //     }
-    
-        //     $tvShow = $this->create($request);
-
-
-        //     \Log::info($tvShow);
-
-        //     $return = [
-        //         'status' => true,
-        //         'tvshow' => $tvShow
-        //     ];
-
-        // } catch (HandleExceptions $th) {
-            
-        //     \Log::info("wadwdawoduiaowaowidn");
-
-        //     throw $th;
-
-
-        // } finally {
-
-        //     return $return;
-
-        // }
-
         $response = [
             'status' => false,
             'response' => "ok"
         ];
-
-        \Log::info($request->tvshow);
 
         $validator = Validator::make($request->tvshow,
             [
@@ -241,7 +139,7 @@ class SpaController extends Controller
                 'year' => 'required|integer|min:1901',
                 'category_id' => 'required|integer|min:1',
                 'status_id' => 'required|integer|min:1',
-                'seasons_quantity' => 'integer|min:1',
+                'seasons_quantity' => 'integer|min:1|max:80',
             ]
         );
 
@@ -261,6 +159,42 @@ class SpaController extends Controller
             $tvShow = $this->create($request->tvshow);
         }
 
+
+        if($tvShow){
+            $response = [
+                'status' => true,
+                'tvshow' => $tvShow,
+                'response' => "ok"
+            ];
+        }
+
+        return $response;
+
+    }
+
+    public function updateTvshow(Request $request, $id)
+    {
+        $validator = Validator::make($request->tvshow,
+            [
+                'name' => ['required', 'max:200'],
+                'synopsis' => 'required|min:0|max:500',
+                'year' => 'required|integer|min:1901',
+                'category_id' => 'required|integer|min:1',
+                'status_id' => 'required|integer|min:1',
+                'seasons_quantity' => 'integer|min:1',
+            ]
+        );
+
+        if ($validator->fails()) {
+            
+            $response['response'] = $validator->messages();
+
+            return $response;
+        }
+
+        if($request->tvshow['id'] != 0){
+            $tvShow = $this->update($request->tvshow);
+        }
 
         if($tvShow){
             $response = [

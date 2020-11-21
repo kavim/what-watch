@@ -1,19 +1,31 @@
 <template>
     <div class="row justify-content-center">
-        <div class="col-8 m-3">
+        <div class="col-11">
             <!-- <form> -->
-                <div class="form-group">
-                    <label for="Nameson">Nameson  </label>
-                    <input v-model="name" type="text" class="form-control" id="Nameson" placeholder="Nome da serie">
+                <div class="form-group col-md-6 mx-auto my-2">
+                    <div class="radio-btn-group">
+                        <div class="radio" @click="status_id = 1">
+                            <input v-model="this.status_id" type="radio" :value="1">
+                            <label for="click_me">Já assisti</label>
+                        </div>
+                        <div class="radio" @click="status_id = 2">
+                            <input v-model="this.status_id" type="radio" :value="2">
+                            <label for="or_me">Quero VER</label>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="exampleFormControlTextarea1">Sinopson</label>
-                    <textarea v-model="synopsis" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                    <label for="Nameson">Nome da série</label>
+                    <input v-model="name" type="text" class="form-control" id="Nameson" placeholder="Nome da serie" :maxlength="200">
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlTextarea1">Sinopse</label>
+                    <textarea v-model="synopsis" class="form-control" id="exampleFormControlTextarea1" rows="4" placeholder="Sinopse da serie."></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-4">
                         <label for="sq">N.º de temporadas</label>
-                        <input v-model="seasons_quantity" type="number" class="form-control" id="sq">
+                        <input v-model="seasons_quantity" type="number" class="form-control" id="sq" min="1" :max="50" placeholder="minimo 1">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="sq">Categoria</label>
@@ -26,7 +38,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="inputState">State</label>
+                        <label for="inputState">Ano de lançamento</label>
                         <select v-model="year" class="form-control">
                             <option disabled hidden value="0">Ano</option>
                             <option v-for="y in yearAs" v-bind:value="y.value" :key="y.value">
@@ -34,21 +46,20 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group col-md-6 mx-auto my-2">
-                        <div class="radio-btn-group">
-                            <div class="radio" @click="status_id = 1">
-                                <input v-model="this.status_id" type="radio" :value="1">
-                                <label for="click_me">Já assisti</label>
-                            </div>
-                            <div class="radio" @click="status_id = 2">
-                                <input v-model="this.status_id" type="radio" :value="2">
-                                <label for="or_me">Quero VER</label>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-                <button @click="submit" type="submit" class="btn btn-outline-dark">DALE</button>
+                
             <!-- </form> -->
+        </div>
+
+        <div v-if="errorMsg != null" class="col-11 text-right mt-4">
+            <div class="alert alert-danger" role="alert">
+                {{this.errorMsg}}
+            </div>            
+        </div>
+        
+        <div class="col-11 text-right mt-4">
+            <button type="button" class="btn btn-outline-dark mr-2" data-dismiss="modal" aria-label="Close">Cancelar</button>
+            <button @click="submit" type="submit" class="btn btn-success" v-text="this.updating ? 'Atualizar' : 'Adicionar'" :disabled="validateBtn"></button>
         </div>
         
     </div>
@@ -76,7 +87,8 @@
                 seasons_quantity: null,
                 category_id: 0,
                 status_id: 1,
-                year: 0
+                year: 0,
+                errorMsg: null
             }
         },
         methods: {
@@ -91,17 +103,26 @@
                     status_id: this.status_id,
                 }
 
+                if(ts.id == 0){
+                    this.storeTvshow(ts);
+                }else{
+                    this.updateTvshow(ts);
+                }
+
+                
+            },
+            storeTvshow(ts){
                 let that = this;
                 
                 axios.post('/api/save-tvshow', {
                     tvshow: ts
                 })
                 .then(function (response) {
-                    
-                    if (response.status != 200 || !response.data.status) {
+                    if (response.status != 200 || !response.data.status) {   
+                        
+                        this.errorMsg = response.data.response.seasons_quantity;
                         
                         return new Error("Something went wrong");
-
                     }
 
                     that.$store.dispatch("saveTvShow", response.data.tvshow);
@@ -111,48 +132,74 @@
                 })
                 .catch(function (error) {
                     alert(error);
-                    alert("not ok");
+                    this.errorMsg = error;
+                });
+            },
+            updateTvshow(ts){
+                let that = this;
+                
+                axios.put("/api/update-tvshow/" + ts.id, {
+                    tvshow: ts
+                })
+                .then(function (response) {
+                    if (response.status != 200 || !response.data.status) {                        
+                        return new Error("Something went wrong");
+                    }
+
+                    that.$store.dispatch("saveTvShow", response.data.tvshow);
+
+                    $('#modal').modal('toggle');
+
+                })
+                .catch(function (error) {
+                    alert(error);
+
                 });
             },
             syncData(){
                 if(this.updating){
                     
-                    this.id = this.to_update.id,
-                    this.name= this.to_update.name,
-                    this.year= this.to_update.year,
-                    this.synopsis= this.to_update.synopsis,
-                    this.seasons_quantity= this.to_update.seasons_quantity,
-                    this.category_id= this.to_update.category_id,
-                    this.status_id= this.to_update.status_id,
-                    this.year= this.to_update.year
-
-                    console.log("this.to_update");
+                    this.id = this.to_update.id;
+                    this.name= this.to_update.name;
+                    this.year= this.to_update.year;
+                    this.synopsis= this.to_update.synopsis;
+                    this.seasons_quantity= this.to_update.seasons_quantity;
+                    this.category_id= this.to_update.category_id;
+                    this.status_id= this.to_update.status_id;
+                    this.year= this.to_update.year;
                     
                 }else{
 
-                    this.id = 0,
-                    this.name= '',
-                    this.year= null,
-                    this.synopsis= '',
-                    this.seasons_quantity= null,
-                    this.category_id= 0,
-                    this.status_id= 0,
-                    this.year= 0
-
-                    console.log("add ts");
+                    this.id = 0;
+                    this.name= '';
+                    this.year= null;
+                    this.synopsis= '';
+                    this.seasons_quantity= null;
+                    this.category_id= 0;
+                    this.status_id= 1;
+                    this.year= 0;
 
                 }
+            },
+            updateValue(event) {
+                const value = event.target.value
+                console.log(value, this.amount)
+                    if (String(value).length <= 10) {
+                        this.amount = value
+                    }
+                this.$forceUpdate()
             }
         },
         watch: {
-
             updating: function(){
                 this.syncData();
             },
             to_update_id: function(){
                 this.syncData();
-            }
-            
+            },
+            to_update: function(){
+                this.errorMsg = '';
+            },
         },
         computed: {
             categoriesAs: function(){
@@ -172,6 +219,14 @@
                 });
 
                 return retorno;
+            },
+            validateBtn: function(){
+
+                if(this.name != '' && this.synopsis && this.seasons_quantity > 0 && this.category_id > 0 && this.year != 0){
+                    return false;
+                }
+
+                return true;
             }
         }
     }

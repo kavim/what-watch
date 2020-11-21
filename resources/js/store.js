@@ -19,7 +19,9 @@ export default new Vuex.Store({
       
     },
     getters: {
-
+      haveListTvShow: state =>{
+        return state.tvshows.length > 0 ? true : false;
+      },
     },
     mutations:{
       store_tvshows(state, tvshows){

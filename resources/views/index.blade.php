@@ -14,7 +14,7 @@
 
     </head>
     <body>
-        <div id="app">
+        <div id="app" class="degrade">
             <home></home>
         </div>
 

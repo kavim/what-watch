@@ -18,8 +18,8 @@ class CreateTvShowsTable extends Migration
 
             $table->string('name');
             $table->string('synopsis');
-            $table->unsignedSmallInteger('year');
-            $table->unsignedTinyInteger('seasons_quantity');
+            $table->unsignedSmallInteger('year')->nullable();
+            $table->unsignedTinyInteger('seasons_quantity')->nullable();
             
 
             $table->unsignedBigInteger('category_id');

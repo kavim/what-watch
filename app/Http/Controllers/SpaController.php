@@ -247,7 +247,7 @@ class SpaController extends Controller
     public function saveCover(Request $request)
     {
 
-        \Log::info($request);
+        // \Log::info($request);
 
         $request['data'] = json_decode($request['data']);
 

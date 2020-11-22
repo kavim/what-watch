@@ -271,7 +271,7 @@ class SpaController extends Controller
 
         return [
             'status' => true,
-            'src' => $img->src
+            'src' => "/storage/".$img->src
         ];
     }
 }

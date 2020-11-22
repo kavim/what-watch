@@ -1,61 +1,74 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# sobre o projeto
+**Montar uma interface que seja possível criar uma lista de séries que você já viu e que quer ver.**
+Séries:
+- Já vi
+- Quero ver
+- Adicionar nova série
+- Remover série
+- Editar e/ou atualizar série
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+### Os dados básicos que a série precisa ter:
+- nome da série
+- Ano de lançamento
+- número de temporadas
+- sinopse
+- categoria (terror, comédia, drama etc)
 
-## About Laravel
+## Como fazer deploy localmente
+### Requisitos 
+É necessário ter instado 
+- PHP 7.3^ e algumas extensões
+    - BCMath PHP Extension
+    - Ctype PHP Extension
+    - Fileinfo PHP Extension
+    - JSON PHP Extension
+    - Mbstring PHP Extension
+    - OpenSSL PHP Extension
+    - PDO PHP Extension
+    - Tokenizer PHP Extension
+    - XML PHP Extension
+- Composer
+    - O Laravel utiliza o Composer para gerenciar suas dependências. Portanto, antes de usar o Laravel, certifique-se de ter o Composer instalado em sua máquina.
+- Mysql 
+- Node & Npm
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Baixar e instalar dependências do projeto
+**composer install** - O composer vai lidar com as dependências do Laravel
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Editar arquivo .env.example** - Após rodar o comando acima na raiz da projeto podemos encontrar o seguinte arquivo ".env.example". Precisamos gerar um cópia do mesmo com o seguinte nome ".env" para fazer numa distro linux podemos usar o comando:
+~~~bash
+cp .env.example .env
+~~~
+Feito isso basta alterar os parametros necessarios para acessar a base de dados. Por exemplo.
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=nomeDaBaseDeDados
+DB_USERNAME=Usuario
+DB_PASSWORD=Senha
+**OBS: A base de dados precisar ser criada previamente.**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**php artisan key:generate** - Para criar uma chave em APP_KEY= no arquivo .env
 
-## Learning Laravel
+**npm install** - O Npm vai lidar com as dependencias do Vuejs.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**php artisan migrate** - Para criar as tabelas na base de dados.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**php artisan db:seed** - Para alimentar as tabelas criadas anteriormente.
 
-## Laravel Sponsors
+**php artisan storage:link** - O diretório storage/app/public pode ser usado para armazenar arquivos gerados pelo usuário, como avatares de perfil, que devem ser acessíveis ao público. Você deve criar um link simbólico em public/storage que aponta para este diretório.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+**Diversas formas de fazer o mesmo**
+ Se você instalou o PHP localmente e gostaria de usar o servidor de desenvolvimento embutido do PHP para servir sua aplicação, você pode usar o comando Artisan serve. Este comando iniciará um servidor de desenvolvimento em http: // localhost: 8000:
+~~~bash
+php artisan serve
+~~~
 
-### Premium Partners
+OBS: não é a opção mais robusta. existem outros métodos por exemplo:
+- Laragon (A melhor solução para windown)  https://www.youtube.com/watch?v=KBimnW4WeBg
+- Xampp com VirtualHost https://youtu.be/X4aaPtEbeVM
+- Laradock com Docker https://www.youtube.com/watch?v=6XfZLqoywz4
+- Nginx 
+- Homestead e Valet
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Mais detalhes sobre na Documentação do  [Laravel](https://laravel.com/docs/8.x#server-requirements) 

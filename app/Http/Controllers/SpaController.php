@@ -235,14 +235,12 @@ class SpaController extends Controller
 
     public function destroy($id)
     {
-        $cover = \App\Cover::where('tvshow_id', $id)->first();
+        $cover = \App\Cover::where('tvshow_id', $id)->delete();
 
         if($cover){
-            $cover->delete();
+            \App\TvShow::destroy($id);
         }        
         
-        \App\TvShow::destroy($id);
-
         return ['response' => 'ok'];
     }
 

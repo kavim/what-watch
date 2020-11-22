@@ -14,6 +14,7 @@ import store from './store.js';
 
 Vue.component('home', require('./components/Home.vue').default);
 Vue.component('tvshow', require('./components/Tvshow.vue').default);
+Vue.component('cover', require('./components/Cover.vue').default);
 
 const app = new Vue({
     store,

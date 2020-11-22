@@ -1899,6 +1899,57 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Cover.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Cover.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      image: this.$store.state.cover
+    };
+  },
+  methods: {
+    onImageChange: function onImageChange(e) {
+      var _this = this;
+
+      this.image.data = e.target.files[0];
+      var image = e.target.files[0];
+      var reader = new FileReader();
+      reader.readAsDataURL(image);
+
+      reader.onload = function (e) {
+        _this.image.src = e.target.result;
+      };
+
+      this.image.update = 1;
+      this.syncdata();
+    },
+    syncdata: function syncdata() {
+      this.$store.dispatch("setCover", this.image);
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Home.vue?vue&type=script&lang=js&":
 /*!***************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Home.vue?vue&type=script&lang=js& ***!
@@ -1908,6 +1959,10 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
 //
 //
 //
@@ -2115,6 +2170,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     updating: {
@@ -2128,7 +2186,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   data: function data() {
-    return _defineProperty({
+    var _ref;
+
+    return _ref = {
       id: 0,
       name: '',
       year: null,
@@ -2136,7 +2196,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       seasons_quantity: null,
       category_id: 0,
       status_id: 1
-    }, "year", 0);
+    }, _defineProperty(_ref, "year", 0), _defineProperty(_ref, "cover", '/image/default-movie.png'), _ref;
   },
   methods: {
     submit: function submit() {
@@ -2161,13 +2221,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       axios.post('/api/save-tvshow', {
         tvshow: ts
       }).then(function (response) {
-        console.log(response);
-
         if (response.status != 200 || !response.data.status) {
           return new Error("Something went wrong");
         }
 
-        that.$store.dispatch("saveTvShow", response.data.tvshow);
+        var newTvshow = response.data.tvshow;
+        that.saveCover(response.data.tvshow.id).then(function (data) {
+          newTvshow.cover = data.src;
+        });
+        that.$store.dispatch("saveTvShow", newTvshow);
         $('#modal').modal('toggle');
         that.syncData();
       })["catch"](function (error) {
@@ -2183,11 +2245,47 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           return new Error("Something went wrong");
         }
 
-        that.$store.dispatch("saveTvShow", response.data.tvshow);
+        var newTvshow = response.data.tvshow;
+        that.saveCover(response.data.tvshow.id).then(function (data) {
+          newTvshow.cover = data.src;
+        })["catch"](function (error) {
+          console.log(error);
+          newTvshow = response.data.tvshow.cover;
+        }).then(function () {
+          that.$store.dispatch("saveTvShow", newTvshow);
+        });
         $('#modal').modal('toggle');
       })["catch"](function (error) {
         alert(error);
       });
+    },
+    saveCover: function saveCover(id) {
+      var to_return;
+
+      if (this.$store.state.cover.update && this.$store.state.cover.update == 1) {
+        var config = {
+          headers: {
+            "content-type": "multipart/form-data"
+          }
+        };
+        var data = new FormData();
+        data.append('cover', this.$store.state.cover.data);
+        var json = JSON.stringify({
+          tvshow_id: id
+        });
+        data.append('data', json);
+        return axios.post("/api/save-cover", data, config).then(function (response) {
+          if (response.status != 200 && !response.data.status) {
+            return new Error("Something went wrong");
+          }
+
+          return response.data;
+        })["catch"](function (error) {
+          return error;
+        });
+      }
+
+      return false;
     },
     syncData: function syncData() {
       if (this.updating) {
@@ -2199,6 +2297,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.category_id = this.to_update.category_id;
         this.status_id = this.to_update.status_id;
         this.year = this.to_update.year;
+        this.cover = this.to_update.cover; // console.log(this.to_update);
+
+        this.$store.dispatch("setCover", {
+          src: this.cover,
+          data: '',
+          update: 0
+        });
       } else {
         this.id = 0;
         this.name = '';
@@ -2208,11 +2313,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.category_id = 0;
         this.status_id = 1;
         this.year = 0;
+        this.cover = '/image/default-movie.png';
+        this.$store.dispatch("setCover", {
+          src: this.cover,
+          data: '',
+          update: 0
+        });
       }
     },
     seasons_quantity_filter: function seasons_quantity_filter(event) {
-      var value = event.target.value;
-      console.log(value, this.amount);
+      var value = event.target.value; // console.log(value, this.amount)
 
       if (String(value).length <= 2) {
         this.seasons_quantity = value;
@@ -37840,6 +37950,63 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Cover.vue?vue&type=template&id=485718dc&":
+/*!********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Cover.vue?vue&type=template&id=485718dc& ***!
+  \********************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "row" }, [
+    _c("div", { staticClass: "col-6 text-center px-5" }, [
+      _c("img", {
+        staticClass: "img-fluid rounded col-6 col-sm-12",
+        attrs: { id: "blah", src: this.$store.state.cover.src }
+      }),
+      _vm._v(" "),
+      _vm._m(0),
+      _vm._v(" "),
+      _c("input", {
+        attrs: {
+          id: "file-upload",
+          type: "file",
+          name: "image",
+          accept: "image/jpeg, image/jpg, image/png"
+        },
+        on: { change: _vm.onImageChange }
+      })
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "label",
+      { staticClass: "btn btn-success mt-2", attrs: { for: "file-upload" } },
+      [
+        _c("i", { staticClass: "fa fa-cloud-upload" }),
+        _vm._v(" Alterar\n      ")
+      ]
+    )
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Home.vue?vue&type=template&id=f2b6376c&":
 /*!*******************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Home.vue?vue&type=template&id=f2b6376c& ***!
@@ -37891,42 +38058,21 @@ var render = function() {
               "div",
               {
                 key: index,
-                staticClass: "col-12 col-md-8 mx-auto bg-white rounded mt-3 p-4"
+                staticClass:
+                  "col-12 col-md-8 mx-auto bg-white rounded mt-3 p-4",
+                staticStyle: { "word-break": "break-all" }
               },
               [
                 _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "col-6" }, [
+                  _c("div", { staticClass: "col-10 col-md-6" }, [
                     _c("span", { staticClass: "ts_title" }, [
                       _vm._v(_vm._s(tvshow.name))
                     ]),
                     _vm._v(",\n                    "),
-                    _c("span", [_vm._v(_vm._s(tvshow.year))]),
-                    _vm._v(" "),
-                    _c("br"),
-                    _vm._v(" "),
-                    _c("span", [
-                      _c("i", { staticClass: "fas fa-stream" }),
-                      _vm._v(
-                        " " + _vm._s(tvshow.seasons_quantity) + " Temporadas"
-                      )
-                    ]),
-                    _vm._v(
-                      "\n                     \n                     \n                    "
-                    ),
-                    _c("span", [
-                      _c("i", { staticClass: "fas fa-film" }),
-                      _vm._v(
-                        " " +
-                          _vm._s(_vm.filterTvshowCategory(tvshow.category_id))
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("br"),
-                    _vm._v(" "),
-                    _c("span", [_vm._v(_vm._s(tvshow.synopsis))])
+                    _c("span", [_vm._v(_vm._s(tvshow.year))])
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "col-6 text-right" }, [
+                  _c("div", { staticClass: "col-2 col-md-6 text-right" }, [
                     _c(
                       "button",
                       {
@@ -37954,6 +38100,38 @@ var render = function() {
                       },
                       [_c("i", { staticClass: "fas fa-trash-alt" })]
                     )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row mt-2" }, [
+                  _c("div", { staticClass: "col-3 col-md-2" }, [
+                    _c("img", {
+                      staticClass: "img-fluid",
+                      attrs: { src: tvshow.cover, alt: tvshow.cover }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-9 col-md-10" }, [
+                    _c("span", [
+                      _c("i", { staticClass: "fas fa-stream" }),
+                      _vm._v(
+                        " " + _vm._s(tvshow.seasons_quantity) + " Temporadas"
+                      )
+                    ]),
+                    _vm._v(
+                      "\n                     \n                     \n                    "
+                    ),
+                    _c("span", [
+                      _c("i", { staticClass: "fas fa-film" }),
+                      _vm._v(
+                        " " +
+                          _vm._s(_vm.filterTvshowCategory(tvshow.category_id))
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("br"),
+                    _vm._v(" "),
+                    _c("span", [_vm._v(_vm._s(tvshow.synopsis))])
                   ])
                 ])
               ]
@@ -38330,7 +38508,9 @@ var render = function() {
             2
           )
         ])
-      ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "form-row" }, [_c("cover")], 1)
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "col-11 text-right mt-4" }, [
@@ -51810,6 +51990,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
 Vue.component('home', __webpack_require__(/*! ./components/Home.vue */ "./resources/js/components/Home.vue")["default"]);
 Vue.component('tvshow', __webpack_require__(/*! ./components/Tvshow.vue */ "./resources/js/components/Tvshow.vue")["default"]);
+Vue.component('cover', __webpack_require__(/*! ./components/Cover.vue */ "./resources/js/components/Cover.vue")["default"]);
 var app = new Vue({
   store: _store_js__WEBPACK_IMPORTED_MODULE_0__["default"],
   el: '#app'
@@ -51859,6 +52040,75 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+/***/ }),
+
+/***/ "./resources/js/components/Cover.vue":
+/*!*******************************************!*\
+  !*** ./resources/js/components/Cover.vue ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Cover_vue_vue_type_template_id_485718dc___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Cover.vue?vue&type=template&id=485718dc& */ "./resources/js/components/Cover.vue?vue&type=template&id=485718dc&");
+/* harmony import */ var _Cover_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Cover.vue?vue&type=script&lang=js& */ "./resources/js/components/Cover.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _Cover_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Cover_vue_vue_type_template_id_485718dc___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Cover_vue_vue_type_template_id_485718dc___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Cover.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Cover.vue?vue&type=script&lang=js&":
+/*!********************************************************************!*\
+  !*** ./resources/js/components/Cover.vue?vue&type=script&lang=js& ***!
+  \********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Cover_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./Cover.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Cover.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Cover_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Cover.vue?vue&type=template&id=485718dc&":
+/*!**************************************************************************!*\
+  !*** ./resources/js/components/Cover.vue?vue&type=template&id=485718dc& ***!
+  \**************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Cover_vue_vue_type_template_id_485718dc___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./Cover.vue?vue&type=template&id=485718dc& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Cover.vue?vue&type=template&id=485718dc&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Cover_vue_vue_type_template_id_485718dc___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Cover_vue_vue_type_template_id_485718dc___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
 
 /***/ }),
 
@@ -52025,12 +52275,18 @@ var tvshows = window.localStorage.getItem('tvshows');
 var categories = window.localStorage.getItem('categories');
 var status = window.localStorage.getItem('status');
 var years = window.localStorage.getItem('years');
+var cover = window.localStorage.getItem('cover');
 /* harmony default export */ __webpack_exports__["default"] = (new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store({
   state: {
     tvshows: tvshows ? JSON.parse(tvshows) : [],
     categories: categories ? JSON.parse(categories) : [],
     status: status ? JSON.parse(status) : [],
-    years: years ? JSON.parse(years) : []
+    years: years ? JSON.parse(years) : [],
+    cover: cover ? JSON.parse(cover) : {
+      src: '/image/default-movie.png',
+      data: '',
+      update: 0
+    }
   },
   getters: {
     haveListTvShow: function haveListTvShow(state) {
@@ -52062,6 +52318,7 @@ var years = window.localStorage.getItem('years');
         found.status_id = tvshow.status_id;
         found.synopsis = tvshow.synopsis;
         found.year = tvshow.year;
+        found.cover = tvshow.cover;
       } else {
         state.tvshows.push(tvshow);
       }
@@ -52075,6 +52332,9 @@ var years = window.localStorage.getItem('years');
       if (index > -1) {
         state.tvshows.splice(index, 1);
       }
+    },
+    store_setCover: function store_setCover(state, cover) {
+      state.cover = cover; // window.localStorage.setItem('cover', JSON.stringify(state.cover));
     }
   },
   actions: {
@@ -52123,6 +52383,10 @@ var years = window.localStorage.getItem('years');
     deleteTvShow: function deleteTvShow(_ref6, id) {
       var commit = _ref6.commit;
       commit('delete_tvshow', id);
+    },
+    setCover: function setCover(_ref7, image) {
+      var commit = _ref7.commit;
+      this.commit('store_setCover', image);
     }
   }
 }));

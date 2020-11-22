@@ -16,13 +16,22 @@
             </div>
         </div> -->
         <div v-if="this.$store.getters.haveListTvShow" class="row">
-            <div class="col-12 col-md-8 mx-auto bg-white rounded mt-3 p-4" v-for="(tvshow, index) in listTvShow" :key="index">
+            <div class="col-12 col-md-8 mx-auto bg-white rounded mt-3 p-4" style="word-break: break-all;" v-for="(tvshow, index) in listTvShow" :key="index">
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-10 col-md-6">
                         <span class="ts_title">{{tvshow.name}}</span>,
-                        <span>{{tvshow.year}}</span>
-                        
-                        <br>
+                        <span>{{tvshow.year}}</span>                        
+                    </div>
+                    <div class="col-2 col-md-6 text-right">
+                        <button @click="editTvShow(tvshow)" type="button" class="btn btn-outline-primary"><i class="fas fa-pen"></i></button>
+                        <button @click="deleteTvShow(tvshow)" type="button" class="btn btn-outline-danger"><i class="fas fa-trash-alt"></i></button>
+                    </div>                    
+                </div>    
+                <div class="row mt-2">
+                    <div class="col-3 col-md-2">
+                        <img class="img-fluid" :src="tvshow.cover" :alt="tvshow.cover">
+                    </div>
+                    <div class="col-9 col-md-10">
                         
                         <span><i class="fas fa-stream"></i> {{tvshow.seasons_quantity}} Temporadas</span>
                         &nbsp;
@@ -32,13 +41,8 @@
                         <br>
 
                         <span>{{tvshow.synopsis}}</span>
-                        
                     </div>
-                    <div class="col-6 text-right">
-                        <button @click="editTvShow(tvshow)" type="button" class="btn btn-outline-primary"><i class="fas fa-pen"></i></button>
-                        <button @click="deleteTvShow(tvshow)" type="button" class="btn btn-outline-danger"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </div>        
+                </div>    
             </div>
         </div>
         <div v-else class="row">

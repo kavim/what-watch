@@ -47,6 +47,9 @@
                         </select>
                     </div>
                 </div>
+                <div class="form-row">
+                    <cover></cover>
+                </div>
                 
             <!-- </form> -->
         </div>
@@ -82,6 +85,7 @@
                 category_id: 0,
                 status_id: 1,
                 year: 0,
+                cover: '/image/default-movie.png'
             }
         },
         methods: {
@@ -110,17 +114,24 @@
                     tvshow: ts
                 })
                 .then(function (response) {
-                    console.log(response);
 
                     if (response.status != 200 || !response.data.status) {   
                         return new Error("Something went wrong");
                     }
 
-                    that.$store.dispatch("saveTvShow", response.data.tvshow);
+                    let newTvshow = response.data.tvshow;
 
-                    $('#modal').modal('toggle');
+                    that.saveCover(response.data.tvshow.id)
+                    .then(data => {
+                        newTvshow.cover = data.src;
+                    });                    
+
+                    that.$store.dispatch("saveTvShow", newTvshow);
+
+                    $('#modal').modal('toggle');                    
 
                     that.syncData();
+                    
 
                 })
                 .catch(function (error) {
@@ -138,7 +149,19 @@
                         return new Error("Something went wrong");
                     }
 
-                    that.$store.dispatch("saveTvShow", response.data.tvshow);
+                    let newTvshow = response.data.tvshow;
+                    
+                    that.saveCover(response.data.tvshow.id)
+                    .then(data => {
+                        newTvshow.cover = data.src;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        newTvshow = response.data.tvshow.cover;
+                    })
+                    .then(function () {
+                        that.$store.dispatch("saveTvShow", newTvshow);
+                    });                  
 
                     $('#modal').modal('toggle');
 
@@ -147,6 +170,38 @@
                     alert(error);
 
                 });
+            },
+            saveCover(id){
+
+                var to_return;
+
+                if(this.$store.state.cover.update && this.$store.state.cover.update == 1){
+                    const config = {
+                        headers: { "content-type": "multipart/form-data" },
+                    };
+                    const data = new FormData();
+                    data.append('cover', this.$store.state.cover.data);
+                    const json = JSON.stringify({
+                        tvshow_id: id
+                    });
+
+                    data.append('data', json);
+
+                    return axios.post("/api/save-cover", data, config)
+                        .then(response => {
+
+                            if (response.status != 200 && !response.data.status) {
+                                return new Error("Something went wrong");
+                            }
+
+                            return response.data;
+
+                        })
+                        .catch(function(error) {
+                            return error;
+                        });
+                }
+                return false;
             },
             syncData(){
                 if(this.updating){
@@ -159,6 +214,11 @@
                     this.category_id= this.to_update.category_id;
                     this.status_id= this.to_update.status_id;
                     this.year= this.to_update.year;
+                    this.cover= this.to_update.cover;
+
+                    // console.log(this.to_update);
+
+                    this.$store.dispatch("setCover", { src: this.cover, data: '', update: 0});
                     
                 }else{
 
@@ -170,12 +230,15 @@
                     this.category_id= 0;
                     this.status_id= 1;
                     this.year= 0;
+                    this.cover= '/image/default-movie.png';
+
+                    this.$store.dispatch("setCover", { src: this.cover, data: '', update: 0});
 
                 }
             },
             seasons_quantity_filter(event) {
-                const value = event.target.value
-                console.log(value, this.amount)
+                const value = event.target.value;
+                // console.log(value, this.amount)
                     if (String(value).length <= 2) {
                         this.seasons_quantity = value
                     }

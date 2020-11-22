@@ -8,15 +8,19 @@ let tvshows = window.localStorage.getItem('tvshows');
 let categories = window.localStorage.getItem('categories');
 let status = window.localStorage.getItem('status');
 let years = window.localStorage.getItem('years');
+let cover = window.localStorage.getItem('cover');
 
 export default new Vuex.Store({
     state: {
-        
       tvshows: tvshows ? JSON.parse(tvshows) : [],
       categories: categories ? JSON.parse(categories) : [],
       status: status ? JSON.parse(status) : [],
       years: years ? JSON.parse(years) : [],
-      
+      cover: cover ? JSON.parse(cover) : {
+        src: '/image/default-movie.png',
+        data: '',
+        update: 0
+      },
     },
     getters: {
       haveListTvShow: state =>{
@@ -48,6 +52,7 @@ export default new Vuex.Store({
             found.status_id = tvshow.status_id;
             found.synopsis = tvshow.synopsis;
             found.year = tvshow.year;
+            found.cover = tvshow.cover;
 
         }else{
 
@@ -63,15 +68,17 @@ export default new Vuex.Store({
             state.tvshows.splice(index, 1);
         }
 
-      }
-      
+      },
+      store_setCover(state, cover){
+        state.cover = cover;
+        // window.localStorage.setItem('cover', JSON.stringify(state.cover));
+      },      
     },
     actions: {
       getTvShows({ commit, dispatch  }) {
         axios.get('/api/get-tvshows/')
         .then(function (response) {
             commit('store_tvshows', response.data.tvshows);
-
             return true;
         })
         .catch(function (error) {
@@ -109,17 +116,15 @@ export default new Vuex.Store({
             console.log("DEU ERRO get-status");
         });
       },
-      
-      saveTvShow({ commit }, tvshow) {
-        
-        commit('save_tvShow', tvshow);
-        
+      saveTvShow({ commit }, tvshow) {        
+        commit('save_tvShow', tvshow);        
       },
       deleteTvShow({ commit }, id){
-
         commit('delete_tvshow', id);
-
-      }
+      },
+      setCover({ commit }, image){
+        this.commit('store_setCover', image);
+      },
 
     },
 

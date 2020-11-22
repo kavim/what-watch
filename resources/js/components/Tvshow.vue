@@ -10,7 +10,7 @@
                         </div>
                         <div class="radio" @click="status_id = 2">
                             <input v-model="this.status_id" type="radio" :value="2">
-                            <label for="or_me">Quero VER</label>
+                            <label for="or_me">Quero Ver</label>
                         </div>
                     </div>
                 </div>
@@ -19,8 +19,8 @@
                     <input v-model="name" type="text" class="form-control" id="Nameson" placeholder="Nome da serie" :maxlength="200">
                 </div>
                 <div class="form-group">
-                    <label for="exampleFormControlTextarea1">Sinopse</label>
-                    <textarea v-model="synopsis" class="form-control" id="exampleFormControlTextarea1" rows="4" placeholder="Sinopse da serie."></textarea>
+                    <label for="exampleFormControlTextarea1">Sinopse {{synopsis.length}}/500</label>
+                    <textarea v-model="synopsis" class="form-control" id="exampleFormControlTextarea1" rows="4" placeholder="Sinopse da serie." :maxlength="500"></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-4">
@@ -119,6 +119,8 @@
                     that.$store.dispatch("saveTvShow", response.data.tvshow);
 
                     $('#modal').modal('toggle');
+
+                    that.syncData();
 
                 })
                 .catch(function (error) {

@@ -8,6 +8,13 @@
             </div>
         </div>
 
+        <!-- {{loading}} -->
+
+        <!-- <div v-if="loading" class="text-center">
+            <div class="spinner-grow" style="width: 3rem; height: 3rem; color:white" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div> -->
         <div v-if="this.$store.getters.haveListTvShow" class="row">
             <div class="col-12 col-md-8 mx-auto bg-white rounded mt-3 p-4" v-for="(tvshow, index) in listTvShow" :key="index">
                 <div class="row">
@@ -63,7 +70,7 @@
     export default {
         data() {
             return {
-                loading: true,
+                // loading: true,
                 to_update: {},
                 to_update_id: 0,
                 updating: false
@@ -82,7 +89,7 @@
                     this.$store.dispatch("getStatus");
                     this.$store.dispatch("getYears");
                     
-                    this.loading = false;
+                    // this.loading = false;
                 });
             },
             addTvshow: function(){

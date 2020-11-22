@@ -71,6 +71,8 @@ export default new Vuex.Store({
         axios.get('/api/get-tvshows/')
         .then(function (response) {
             commit('store_tvshows', response.data.tvshows);
+
+            return true;
         })
         .catch(function (error) {
             console.log(error);

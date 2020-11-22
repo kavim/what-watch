@@ -2,10 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use CreateTvShowsTable;
-use Facade\FlareClient\Http\Response;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Validator;
@@ -15,6 +11,8 @@ class SpaController extends Controller
 
     public function getTvShows()
     {
+        sleep(1);
+
         $return = [
             'status' => false
         ];
@@ -145,7 +143,8 @@ class SpaController extends Controller
 
         if ($validator->fails()) {
             
-            $response['response'] = $validator->messages();
+            $response['response'] = $validator->getMessageBag();
+            // $response['response'] = $validator->messages();
 
             return $response;
         }

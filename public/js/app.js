@@ -1969,10 +1969,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      loading: true,
+      // loading: true,
       to_update: {},
       to_update_id: 0,
       updating: false
@@ -1990,9 +1997,8 @@ __webpack_require__.r(__webpack_exports__);
 
         _this.$store.dispatch("getStatus");
 
-        _this.$store.dispatch("getYears");
+        _this.$store.dispatch("getYears"); // this.loading = false;
 
-        _this.loading = false;
       });
     },
     addTvshow: function addTvshow() {
@@ -2163,6 +2169,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
         that.$store.dispatch("saveTvShow", response.data.tvshow);
         $('#modal').modal('toggle');
+        that.syncData();
       })["catch"](function (error) {
         alert(error);
       });
@@ -38126,7 +38133,7 @@ var render = function() {
                 }
               }),
               _vm._v(" "),
-              _c("label", { attrs: { for: "or_me" } }, [_vm._v("Quero VER")])
+              _c("label", { attrs: { for: "or_me" } }, [_vm._v("Quero Ver")])
             ]
           )
         ])
@@ -38165,7 +38172,7 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "form-group" }, [
         _c("label", { attrs: { for: "exampleFormControlTextarea1" } }, [
-          _vm._v("Sinopse")
+          _vm._v("Sinopse " + _vm._s(_vm.synopsis.length) + "/500")
         ]),
         _vm._v(" "),
         _c("textarea", {
@@ -38181,7 +38188,8 @@ var render = function() {
           attrs: {
             id: "exampleFormControlTextarea1",
             rows: "4",
-            placeholder: "Sinopse da serie."
+            placeholder: "Sinopse da serie.",
+            maxlength: 500
           },
           domProps: { value: _vm.synopsis },
           on: {
@@ -52075,6 +52083,7 @@ var years = window.localStorage.getItem('years');
           dispatch = _ref.dispatch;
       axios__WEBPACK_IMPORTED_MODULE_2___default.a.get('/api/get-tvshows/').then(function (response) {
         commit('store_tvshows', response.data.tvshows);
+        return true;
       })["catch"](function (error) {
         console.log(error);
         console.log("DEU ERRO getTvShow");

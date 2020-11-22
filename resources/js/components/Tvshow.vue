@@ -2,17 +2,25 @@
     <div class="row justify-content-center">
         <div class="col-11">
             <!-- <form> -->
-                <div class="form-group col-md-6 mx-auto my-2">
-                    <div class="radio-btn-group">
-                        <div class="radio" @click="status_id = 1">
-                            <input v-model="this.status_id" type="radio" :value="1">
-                            <label for="click_me">Já assisti</label>
-                        </div>
-                        <div class="radio" @click="status_id = 2">
-                            <input v-model="this.status_id" type="radio" :value="2">
-                            <label for="or_me">Quero Ver</label>
+                <div class="form-row col-12 my-2">
+                    
+                    <div class="form-group col-12 col-md-3 text-center">
+                        <cover></cover>
+                    </div>
+                    
+                    <div class="form-group col-12 col-md-9">
+                        <div class="radio-btn-group">
+                            <div class="radio" @click="status_id = 1">
+                                <input v-model="this.status_id" type="radio" :value="1">
+                                <label for="click_me"> <i class="fas fa-check"></i> Já assisti</label>
+                            </div>
+                            <div class="radio" @click="status_id = 2">
+                                <input v-model="this.status_id" type="radio" :value="2">
+                                <label for="or_me"> <i class="fas fa-fire"></i> Quero Ver</label>
+                            </div>
                         </div>
                     </div>
+                    
                 </div>
                 <div class="form-group">
                     <label for="Nameson">Nome da série</label>
@@ -46,9 +54,6 @@
                             </option>
                         </select>
                     </div>
-                </div>
-                <div class="form-row">
-                    <cover></cover>
                 </div>
                 
             <!-- </form> -->
@@ -121,14 +126,30 @@
 
                     let newTvshow = response.data.tvshow;
 
-                    that.saveCover(response.data.tvshow.id)
-                    .then(data => {
-                        newTvshow.cover = data.src;
-                    });                    
 
-                    that.$store.dispatch("saveTvShow", newTvshow);
+                    if(that.$store.state.cover.update && that.$store.state.cover.update == 1){
 
-                    $('#modal').modal('toggle');                    
+                        that.saveCover(response.data.tvshow.id)
+                        .then(data => {
+                            newTvshow.cover = data.src;
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            newTvshow = response.data.tvshow.cover;
+                        })
+                        .then(function () {
+                            that.$store.dispatch("saveTvShow", newTvshow);
+
+                            $('#modal').modal('toggle');
+                        });   
+                                      
+                    }else{
+
+                        that.$store.dispatch("saveTvShow", newTvshow);
+
+                        $('#modal').modal('toggle');  
+
+                    }                    
 
                     that.syncData();
                     
@@ -150,20 +171,30 @@
                     }
 
                     let newTvshow = response.data.tvshow;
-                    
-                    that.saveCover(response.data.tvshow.id)
-                    .then(data => {
-                        newTvshow.cover = data.src;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                        newTvshow = response.data.tvshow.cover;
-                    })
-                    .then(function () {
-                        that.$store.dispatch("saveTvShow", newTvshow);
-                    });                  
 
-                    $('#modal').modal('toggle');
+                    if(that.$store.state.cover.update && that.$store.state.cover.update == 1){
+
+                        that.saveCover(response.data.tvshow.id)
+                        .then(data => {
+                            newTvshow.cover = data.src;
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            newTvshow = response.data.tvshow.cover;
+                        })
+                        .then(function () {
+                            that.$store.dispatch("saveTvShow", newTvshow);
+
+                            $('#modal').modal('toggle');
+                        });   
+                                      
+                    }else{
+
+                        that.$store.dispatch("saveTvShow", newTvshow);
+
+                        $('#modal').modal('toggle');  
+
+                    }   
 
                 })
                 .catch(function (error) {
@@ -173,35 +204,35 @@
             },
             saveCover(id){
 
-                var to_return;
+                // if(!this.$store.state.cover.update && !this.$store.state.cover.update == 1){
+                //     return {src: this.cover};
+                // }
 
-                if(this.$store.state.cover.update && this.$store.state.cover.update == 1){
-                    const config = {
+                const config = {
                         headers: { "content-type": "multipart/form-data" },
                     };
-                    const data = new FormData();
-                    data.append('cover', this.$store.state.cover.data);
-                    const json = JSON.stringify({
-                        tvshow_id: id
-                    });
+                const data = new FormData();
+                data.append('cover', this.$store.state.cover.data);
+                const json = JSON.stringify({
+                    tvshow_id: id
+                });
 
-                    data.append('data', json);
+                data.append('data', json);
 
-                    return axios.post("/api/save-cover", data, config)
-                        .then(response => {
+                return axios.post("/api/save-cover", data, config)
+                .then(response => {
 
-                            if (response.status != 200 && !response.data.status) {
-                                return new Error("Something went wrong");
-                            }
+                    if (response.status != 200 && !response.data.status) {
+                        return new Error("Something went wrong");
+                    }
 
-                            return response.data;
+                    return response.data;
 
-                        })
-                        .catch(function(error) {
-                            return error;
-                        });
-                }
-                return false;
+                })
+                .catch(function(error) {
+                    return new Error("Something went wrong");
+                });
+
             },
             syncData(){
                 if(this.updating){

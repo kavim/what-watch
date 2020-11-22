@@ -8,14 +8,12 @@
             </div>
         </div>
 
-        <!-- {{loading}} -->
-
-        <!-- <div v-if="loading" class="text-center">
+        <div v-if="loading" class="text-center">
             <div class="spinner-grow" style="width: 3rem; height: 3rem; color:white" role="status">
                 <span class="sr-only">Loading...</span>
             </div>
-        </div> -->
-        <div v-if="this.$store.getters.haveListTvShow" class="row">
+        </div>
+        <div v-else-if="this.$store.getters.haveListTvShow" class="row">
             <div class="col-12 col-md-8 mx-auto bg-white rounded mt-3 p-4" style="word-break: break-all;" v-for="(tvshow, index) in listTvShow" :key="index">
                 <div class="row">
                     <div class="col-10 col-md-6">
@@ -88,7 +86,8 @@
         methods: {
             initAssets: function(){
                 this.$store.dispatch("getTvShows").then(() => {
-
+                    
+                    
                     this.$store.dispatch("getCategories");
                     this.$store.dispatch("getStatus");
                     this.$store.dispatch("getYears");
@@ -146,6 +145,19 @@
             listTvShow: function(){
                 return this.$store.state.tvshows;
             },
+            loading: function(){
+                
+                if(this.$store.state.resources.years == 1 && 
+                    this.$store.state.resources.categories == 1 && 
+                    this.$store.state.resources.status == 1 && 
+                    this.$store.state.resources.tvshows == 1)
+                    {
+                        return false;
+
+                    }else{
+                        return true;
+                    }
+            }
         }
     }
 </script>

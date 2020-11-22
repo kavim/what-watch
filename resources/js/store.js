@@ -21,6 +21,12 @@ export default new Vuex.Store({
         data: '',
         update: 0
       },
+      resources: {
+        years: 0,
+        categories: 0,
+        status: 0,
+        tvshows: 0
+      }
     },
     getters: {
       haveListTvShow: state =>{
@@ -30,15 +36,22 @@ export default new Vuex.Store({
     mutations:{
       store_tvshows(state, tvshows){
         state.tvshows = tvshows;
+        state.resources.tvshows = 1;
       },
       store_categories(state, cats){
         state.categories = cats;
+        state.resources.categories = 1;
+        window.localStorage.setItem('categories', JSON.stringify(state.categories));
       },
       store_status(state, status){
         state.status = status;
+        state.resources.status = 1;
+        window.localStorage.setItem('status', JSON.stringify(state.status));
       },
       store_years(state, years){
         state.years = years;
+        state.resources.years = 1;
+        window.localStorage.setItem('years', JSON.stringify(state.years));
       },
       save_tvShow(state, tvshow){
         
@@ -87,34 +100,49 @@ export default new Vuex.Store({
         });
       },
       getCategories({ commit }) {
-        axios.get('/api/get-categories/')
-        .then(function (response) {
-            commit('store_categories', response.data);
-        })
-        .catch(function (error) {
-            console.log(error);
-            console.log("DEU ERRO get-categories");
-        });
+
+        if(this.state.categories.length > 0 ){
+            this.state.resources.categories = 1;
+        }else{
+            axios.get('/api/get-categories/')
+            .then(function (response) {
+                commit('store_categories', response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+                console.log("DEU ERRO get-categories");
+            });
+        }
+        
       },
       getStatus({ commit }) {
-        axios.get('/api/get-status/')
-        .then(function (response) {
-            commit('store_status', response.data);
-        })
-        .catch(function (error) {
-            console.log(error);
-            console.log("DEU ERRO get-status");
-        });
+        if(this.state.status.length > 0 ){
+          this.state.resources.status = 1;
+        }else{
+          axios.get('/api/get-status/')
+          .then(function (response) {
+              commit('store_status', response.data);
+          })
+          .catch(function (error) {
+              console.log(error);
+              console.log("DEU ERRO get-status");
+          });
+        }
       },
       getYears({ commit }) {
-        axios.get('/api/get-years/')
-        .then(function (response) {
-            commit('store_years', response.data);
-        })
-        .catch(function (error) {
-            console.log(error);
-            console.log("DEU ERRO get-status");
-        });
+        if(this.state.years.length > 0 ){
+          this.state.resources.years = 1;
+        }else{
+          axios.get('/api/get-years/')
+          .then(function (response) {
+              commit('store_years', response.data);
+          })
+          .catch(function (error) {
+              console.log(error);
+              console.log("DEU ERRO get-status");
+          });
+        }
+        
       },
       saveTvShow({ commit }, tvshow) {        
         commit('save_tvShow', tvshow);        

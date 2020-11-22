@@ -1,14 +1,12 @@
 
 <template>
-    <div class="row">
-      <div class="col-6 text-center px-5">
-          <img id="blah" :src="this.$store.state.cover.src" class="img-fluid rounded col-6 col-sm-12" />
-          <label for="file-upload" class="btn btn-success mt-2">
+    <div>
+          <img id="blah" :src="this.$store.state.cover.src" class="img-fluid" />
+          <label for="file-upload" class="btn btn-outline-dark mt-2">
             <i class="fa fa-cloud-upload"></i> Alterar
           </label>
           <input id="file-upload" type="file" name="image" accept="image/jpeg, image/jpg, image/png" v-on:change="onImageChange" />
       </div>
-    </div>
 </template>
 <script>
 export default {

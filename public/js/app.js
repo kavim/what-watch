@@ -1918,8 +1918,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1959,8 +1957,6 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-//
-//
 //
 //
 //
@@ -2092,6 +2088,13 @@ __webpack_require__.r(__webpack_exports__);
   computed: {
     listTvShow: function listTvShow() {
       return this.$store.state.tvshows;
+    },
+    loading: function loading() {
+      if (this.$store.state.resources.years == 1 && this.$store.state.resources.categories == 1 && this.$store.state.resources.status == 1 && this.$store.state.resources.tvshows == 1) {
+        return false;
+      } else {
+        return true;
+      }
     }
   }
 });
@@ -2109,6 +2112,11 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2226,11 +2234,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
 
         var newTvshow = response.data.tvshow;
-        that.saveCover(response.data.tvshow.id).then(function (data) {
-          newTvshow.cover = data.src;
-        });
-        that.$store.dispatch("saveTvShow", newTvshow);
-        $('#modal').modal('toggle');
+
+        if (that.$store.state.cover.update && that.$store.state.cover.update == 1) {
+          that.saveCover(response.data.tvshow.id).then(function (data) {
+            newTvshow.cover = data.src;
+          })["catch"](function (error) {
+            console.log(error);
+            newTvshow = response.data.tvshow.cover;
+          }).then(function () {
+            that.$store.dispatch("saveTvShow", newTvshow);
+            $('#modal').modal('toggle');
+          });
+        } else {
+          that.$store.dispatch("saveTvShow", newTvshow);
+          $('#modal').modal('toggle');
+        }
+
         that.syncData();
       })["catch"](function (error) {
         alert(error);
@@ -2246,46 +2265,49 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
 
         var newTvshow = response.data.tvshow;
-        that.saveCover(response.data.tvshow.id).then(function (data) {
-          newTvshow.cover = data.src;
-        })["catch"](function (error) {
-          console.log(error);
-          newTvshow = response.data.tvshow.cover;
-        }).then(function () {
+
+        if (that.$store.state.cover.update && that.$store.state.cover.update == 1) {
+          that.saveCover(response.data.tvshow.id).then(function (data) {
+            newTvshow.cover = data.src;
+          })["catch"](function (error) {
+            console.log(error);
+            newTvshow = response.data.tvshow.cover;
+          }).then(function () {
+            that.$store.dispatch("saveTvShow", newTvshow);
+            $('#modal').modal('toggle');
+          });
+        } else {
           that.$store.dispatch("saveTvShow", newTvshow);
-        });
-        $('#modal').modal('toggle');
+          $('#modal').modal('toggle');
+        }
       })["catch"](function (error) {
         alert(error);
       });
     },
     saveCover: function saveCover(id) {
-      var to_return;
+      // if(!this.$store.state.cover.update && !this.$store.state.cover.update == 1){
+      //     return {src: this.cover};
+      // }
+      var config = {
+        headers: {
+          "content-type": "multipart/form-data"
+        }
+      };
+      var data = new FormData();
+      data.append('cover', this.$store.state.cover.data);
+      var json = JSON.stringify({
+        tvshow_id: id
+      });
+      data.append('data', json);
+      return axios.post("/api/save-cover", data, config).then(function (response) {
+        if (response.status != 200 && !response.data.status) {
+          return new Error("Something went wrong");
+        }
 
-      if (this.$store.state.cover.update && this.$store.state.cover.update == 1) {
-        var config = {
-          headers: {
-            "content-type": "multipart/form-data"
-          }
-        };
-        var data = new FormData();
-        data.append('cover', this.$store.state.cover.data);
-        var json = JSON.stringify({
-          tvshow_id: id
-        });
-        data.append('data', json);
-        return axios.post("/api/save-cover", data, config).then(function (response) {
-          if (response.status != 200 && !response.data.status) {
-            return new Error("Something went wrong");
-          }
-
-          return response.data;
-        })["catch"](function (error) {
-          return error;
-        });
-      }
-
-      return false;
+        return response.data;
+      })["catch"](function (error) {
+        return new Error("Something went wrong");
+      });
     },
     syncData: function syncData() {
       if (this.updating) {
@@ -37965,25 +37987,23 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "row" }, [
-    _c("div", { staticClass: "col-6 text-center px-5" }, [
-      _c("img", {
-        staticClass: "img-fluid rounded col-6 col-sm-12",
-        attrs: { id: "blah", src: this.$store.state.cover.src }
-      }),
-      _vm._v(" "),
-      _vm._m(0),
-      _vm._v(" "),
-      _c("input", {
-        attrs: {
-          id: "file-upload",
-          type: "file",
-          name: "image",
-          accept: "image/jpeg, image/jpg, image/png"
-        },
-        on: { change: _vm.onImageChange }
-      })
-    ])
+  return _c("div", [
+    _c("img", {
+      staticClass: "img-fluid",
+      attrs: { id: "blah", src: this.$store.state.cover.src }
+    }),
+    _vm._v(" "),
+    _vm._m(0),
+    _vm._v(" "),
+    _c("input", {
+      attrs: {
+        id: "file-upload",
+        type: "file",
+        name: "image",
+        accept: "image/jpeg, image/jpg, image/png"
+      },
+      on: { change: _vm.onImageChange }
+    })
   ])
 }
 var staticRenderFns = [
@@ -37993,7 +38013,10 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c(
       "label",
-      { staticClass: "btn btn-success mt-2", attrs: { for: "file-upload" } },
+      {
+        staticClass: "btn btn-outline-dark mt-2",
+        attrs: { for: "file-upload" }
+      },
       [
         _c("i", { staticClass: "fa fa-cloud-upload" }),
         _vm._v(" Alterar\n      ")
@@ -38049,7 +38072,9 @@ var render = function() {
       )
     ]),
     _vm._v(" "),
-    this.$store.getters.haveListTvShow
+    _vm.loading
+      ? _c("div", { staticClass: "text-center" }, [_vm._m(1)])
+      : this.$store.getters.haveListTvShow
       ? _c(
           "div",
           { staticClass: "row" },
@@ -38139,7 +38164,7 @@ var render = function() {
           }),
           0
         )
-      : _c("div", { staticClass: "row" }, [_vm._m(1)]),
+      : _c("div", { staticClass: "row" }, [_vm._m(2)]),
     _vm._v(" "),
     _c(
       "div",
@@ -38156,7 +38181,7 @@ var render = function() {
       [
         _c("div", { staticClass: "modal-dialog modal-lg" }, [
           _c("div", { staticClass: "modal-content" }, [
-            _vm._m(2),
+            _vm._m(3),
             _vm._v(" "),
             _c(
               "div",
@@ -38187,6 +38212,20 @@ var staticRenderFns = [
       _c("i", { staticClass: "fas fa-swatchbook" }),
       _vm._v(" Lista de series")
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "spinner-grow",
+        staticStyle: { width: "3rem", height: "3rem", color: "white" },
+        attrs: { role: "status" }
+      },
+      [_c("span", { staticClass: "sr-only" }, [_vm._v("Loading...")])]
+    )
   },
   function() {
     var _vm = this
@@ -38245,75 +38284,82 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "row justify-content-center" }, [
     _c("div", { staticClass: "col-11" }, [
-      _c("div", { staticClass: "form-group col-md-6 mx-auto my-2" }, [
-        _c("div", { staticClass: "radio-btn-group" }, [
-          _c(
-            "div",
-            {
-              staticClass: "radio",
-              on: {
-                click: function($event) {
-                  _vm.status_id = 1
-                }
-              }
-            },
-            [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: this.status_id,
-                    expression: "this.status_id"
-                  }
-                ],
-                attrs: { type: "radio" },
-                domProps: { value: 1, checked: _vm._q(this.status_id, 1) },
+      _c("div", { staticClass: "form-row col-12 my-2" }, [
+        _c(
+          "div",
+          { staticClass: "form-group col-12 col-md-3 text-center" },
+          [_c("cover")],
+          1
+        ),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group col-12 col-md-9" }, [
+          _c("div", { staticClass: "radio-btn-group" }, [
+            _c(
+              "div",
+              {
+                staticClass: "radio",
                 on: {
-                  change: function($event) {
-                    return _vm.$set(this, "status_id", 1)
+                  click: function($event) {
+                    _vm.status_id = 1
                   }
                 }
-              }),
-              _vm._v(" "),
-              _c("label", { attrs: { for: "click_me" } }, [
-                _vm._v("Já assisti")
-              ])
-            ]
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            {
-              staticClass: "radio",
-              on: {
-                click: function($event) {
-                  _vm.status_id = 2
-                }
-              }
-            },
-            [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: this.status_id,
-                    expression: "this.status_id"
+              },
+              [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: this.status_id,
+                      expression: "this.status_id"
+                    }
+                  ],
+                  attrs: { type: "radio" },
+                  domProps: { value: 1, checked: _vm._q(this.status_id, 1) },
+                  on: {
+                    change: function($event) {
+                      return _vm.$set(this, "status_id", 1)
+                    }
                   }
-                ],
-                attrs: { type: "radio" },
-                domProps: { value: 2, checked: _vm._q(this.status_id, 2) },
+                }),
+                _vm._v(" "),
+                _vm._m(0)
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticClass: "radio",
                 on: {
-                  change: function($event) {
-                    return _vm.$set(this, "status_id", 2)
+                  click: function($event) {
+                    _vm.status_id = 2
                   }
                 }
-              }),
-              _vm._v(" "),
-              _c("label", { attrs: { for: "or_me" } }, [_vm._v("Quero Ver")])
-            ]
-          )
+              },
+              [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: this.status_id,
+                      expression: "this.status_id"
+                    }
+                  ],
+                  attrs: { type: "radio" },
+                  domProps: { value: 2, checked: _vm._q(this.status_id, 2) },
+                  on: {
+                    change: function($event) {
+                      return _vm.$set(this, "status_id", 2)
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _vm._m(1)
+              ]
+            )
+          ])
         ])
       ]),
       _vm._v(" "),
@@ -38508,9 +38554,7 @@ var render = function() {
             2
           )
         ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "form-row" }, [_c("cover")], 1)
+      ])
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "col-11 text-right mt-4" }, [
@@ -38538,7 +38582,26 @@ var render = function() {
     ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "click_me" } }, [
+      _c("i", { staticClass: "fas fa-check" }),
+      _vm._v(" Já assisti")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "or_me" } }, [
+      _c("i", { staticClass: "fas fa-fire" }),
+      _vm._v(" Quero Ver")
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -52286,6 +52349,12 @@ var cover = window.localStorage.getItem('cover');
       src: '/image/default-movie.png',
       data: '',
       update: 0
+    },
+    resources: {
+      years: 0,
+      categories: 0,
+      status: 0,
+      tvshows: 0
     }
   },
   getters: {
@@ -52296,15 +52365,22 @@ var cover = window.localStorage.getItem('cover');
   mutations: {
     store_tvshows: function store_tvshows(state, tvshows) {
       state.tvshows = tvshows;
+      state.resources.tvshows = 1;
     },
     store_categories: function store_categories(state, cats) {
       state.categories = cats;
+      state.resources.categories = 1;
+      window.localStorage.setItem('categories', JSON.stringify(state.categories));
     },
     store_status: function store_status(state, status) {
       state.status = status;
+      state.resources.status = 1;
+      window.localStorage.setItem('status', JSON.stringify(state.status));
     },
     store_years: function store_years(state, years) {
       state.years = years;
+      state.resources.years = 1;
+      window.localStorage.setItem('years', JSON.stringify(state.years));
     },
     save_tvShow: function save_tvShow(state, tvshow) {
       var found = state.tvshows.find(function (ts) {
@@ -52351,30 +52427,45 @@ var cover = window.localStorage.getItem('cover');
     },
     getCategories: function getCategories(_ref2) {
       var commit = _ref2.commit;
-      axios__WEBPACK_IMPORTED_MODULE_2___default.a.get('/api/get-categories/').then(function (response) {
-        commit('store_categories', response.data);
-      })["catch"](function (error) {
-        console.log(error);
-        console.log("DEU ERRO get-categories");
-      });
+
+      if (this.state.categories.length > 0) {
+        this.state.resources.categories = 1;
+      } else {
+        axios__WEBPACK_IMPORTED_MODULE_2___default.a.get('/api/get-categories/').then(function (response) {
+          commit('store_categories', response.data);
+        })["catch"](function (error) {
+          console.log(error);
+          console.log("DEU ERRO get-categories");
+        });
+      }
     },
     getStatus: function getStatus(_ref3) {
       var commit = _ref3.commit;
-      axios__WEBPACK_IMPORTED_MODULE_2___default.a.get('/api/get-status/').then(function (response) {
-        commit('store_status', response.data);
-      })["catch"](function (error) {
-        console.log(error);
-        console.log("DEU ERRO get-status");
-      });
+
+      if (this.state.status.length > 0) {
+        this.state.resources.status = 1;
+      } else {
+        axios__WEBPACK_IMPORTED_MODULE_2___default.a.get('/api/get-status/').then(function (response) {
+          commit('store_status', response.data);
+        })["catch"](function (error) {
+          console.log(error);
+          console.log("DEU ERRO get-status");
+        });
+      }
     },
     getYears: function getYears(_ref4) {
       var commit = _ref4.commit;
-      axios__WEBPACK_IMPORTED_MODULE_2___default.a.get('/api/get-years/').then(function (response) {
-        commit('store_years', response.data);
-      })["catch"](function (error) {
-        console.log(error);
-        console.log("DEU ERRO get-status");
-      });
+
+      if (this.state.years.length > 0) {
+        this.state.resources.years = 1;
+      } else {
+        axios__WEBPACK_IMPORTED_MODULE_2___default.a.get('/api/get-years/').then(function (response) {
+          commit('store_years', response.data);
+        })["catch"](function (error) {
+          console.log(error);
+          console.log("DEU ERRO get-status");
+        });
+      }
     },
     saveTvShow: function saveTvShow(_ref5, tvshow) {
       var commit = _ref5.commit;

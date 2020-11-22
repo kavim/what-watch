@@ -30,15 +30,18 @@ body {
 
 .radio-btn-group {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
+    // justify-content: center;
+    margin-top: 10px;
     
     .radio {
-      margin: 0 .25rem;
+      margin: 0 .5rem;
       
       label {
         background: #fff;
         border: 1px solid #ddd;
-        padding: .5rem 1.25rem;
+        padding: 1.1rem 2rem;
+        // padding: 20px 50px;
         border-radius: 5px;
         cursor: pointer;
         color: #444;
@@ -54,10 +57,10 @@ body {
       }
       
       input[type="radio"]:checked+label {
-        background: #2196F3;
+        background: linear-gradient(90deg, rgb(67, 187, 246) 0%, rgba(80,185,207,1) 100%);
         color: #fff;
-        border-color: #2196F3;
-        transform: all 1s ease-in-out
+        border-color: rgb(67, 187, 246);
+        transition: all 0.2s ease-in-out;
       }
     }
   }

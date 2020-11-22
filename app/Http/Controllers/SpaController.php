@@ -237,7 +237,9 @@ class SpaController extends Controller
     {
         $cover = \App\Cover::where('tvshow_id', $id)->first();
 
-        $cover->delete();
+        if($cover){
+            $cover->delete();
+        }        
         
         \App\TvShow::destroy($id);
 

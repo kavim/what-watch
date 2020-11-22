@@ -1943,6 +1943,16 @@ __webpack_require__.r(__webpack_exports__);
     syncdata: function syncdata() {
       this.$store.dispatch("setCover", this.image);
     }
+  },
+  computed: {
+    coverSrc: function coverSrc() {
+      return this.$store.state.cover.src;
+    }
+  },
+  watch: {
+    coverSrc: function coverSrc(value) {
+      this.$refs.fileupload.value = null;
+    }
   }
 });
 
@@ -2280,6 +2290,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           that.$store.dispatch("saveTvShow", newTvshow);
           $('#modal').modal('toggle');
         }
+
+        that.syncData();
       })["catch"](function (error) {
         alert(error);
       });
@@ -37990,12 +38002,13 @@ var render = function() {
   return _c("div", [
     _c("img", {
       staticClass: "img-fluid",
-      attrs: { id: "blah", src: this.$store.state.cover.src }
+      attrs: { id: "blah", src: _vm.coverSrc }
     }),
     _vm._v(" "),
     _vm._m(0),
     _vm._v(" "),
     _c("input", {
+      ref: "fileupload",
       attrs: {
         id: "file-upload",
         type: "file",
@@ -38077,7 +38090,7 @@ var render = function() {
       : this.$store.getters.haveListTvShow
       ? _c(
           "div",
-          { staticClass: "row" },
+          { staticClass: "row mb-5" },
           _vm._l(_vm.listTvShow, function(tvshow, index) {
             return _c(
               "div",

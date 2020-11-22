@@ -1,11 +1,11 @@
 
 <template>
     <div>
-          <img id="blah" :src="this.$store.state.cover.src" class="img-fluid" />
+          <img id="blah" :src="coverSrc" class="img-fluid" />
           <label for="file-upload" class="btn btn-outline-dark mt-2">
             <i class="fa fa-cloud-upload"></i> Alterar
           </label>
-          <input id="file-upload" type="file" name="image" accept="image/jpeg, image/jpg, image/png" v-on:change="onImageChange" />
+          <input id="file-upload" type="file" name="image" accept="image/jpeg, image/jpg, image/png" v-on:change="onImageChange" ref="fileupload"/>
       </div>
 </template>
 <script>
@@ -36,5 +36,15 @@ export default {
     },
 
   },
+  computed: {
+    coverSrc () {
+      return this.$store.state.cover.src
+    }
+  },
+  watch:{
+      coverSrc(value) {
+        this.$refs.fileupload.value = null;
+      }
+  }
 };
 </script>

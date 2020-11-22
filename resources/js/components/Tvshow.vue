@@ -196,6 +196,8 @@
 
                     }   
 
+                    that.syncData();
+
                 })
                 .catch(function (error) {
                     alert(error);

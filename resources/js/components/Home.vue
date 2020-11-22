@@ -13,7 +13,7 @@
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
-        <div v-else-if="this.$store.getters.haveListTvShow" class="row">
+        <div v-else-if="this.$store.getters.haveListTvShow" class="row mb-5">
             <div class="col-12 col-md-8 mx-auto bg-white rounded mt-3 p-4" style="word-break: break-all;" v-for="(tvshow, index) in listTvShow" :key="index">
                 <div class="row">
                     <div class="col-10 col-md-6">

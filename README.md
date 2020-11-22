@@ -72,3 +72,15 @@ OBS: não é a opção mais robusta. existem outros métodos por exemplo:
 - Homestead e Valet
 
 Mais detalhes sobre na Documentação do  [Laravel](https://laravel.com/docs/8.x#server-requirements) 
+
+
+## Permições em diretorios
+Basicamente precisamos dar permissão pra alguns diretorios.
+- storage 
+- vendor 
+
+As permissões para as pastas storage e vendor devem permanecer em 775, por razões de segurança óbvias.
+Mas em um ambiente como este podemos simplesmente usar o comando
+~~~bash
+sudo chmod 777 -R /pasta_do_projeto/storage/
+~~~

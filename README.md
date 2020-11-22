@@ -1,3 +1,6 @@
+
+![alt text](https://i.imgur.com/Z3usKgn.gif "demo")
+
 # sobre o projeto
 **Montar uma interface que seja possível criar uma lista de séries que você já viu e que quer ver.**
 Séries:

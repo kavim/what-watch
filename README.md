@@ -87,3 +87,17 @@ Mas em um ambiente como este podemos simplesmente usar o comando
 ~~~bash
 sudo chmod 777 -R /pasta_do_projeto/storage/
 ~~~
+
+---
+
+### Detalhes
+Na requisição:
+~~~php
+getTvShows()
+~~~
+
+Tem uma função:
+~~~php
+sleep(1)
+~~~
+Para "Sumilar" o carregamento em produção e poder ler o Loading.

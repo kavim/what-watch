@@ -100,4 +100,4 @@ Tem uma função:
 ~~~php
 sleep(1)
 ~~~
-Para "Sumilar" o carregamento em produção e poder ler o Loading.
+Para "Simular" o carregamento em produção e poder ler o Loading.

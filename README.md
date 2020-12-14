@@ -77,7 +77,7 @@ OBS: não é a opção mais robusta. existem outros métodos por exemplo:
 Mais detalhes sobre na Documentação do  [Laravel](https://laravel.com/docs/8.x#server-requirements) 
 
 
-## Permições em diretorios
+## Permissões em diretórios
 Basicamente precisamos dar permissão pra alguns diretorios.
 - storage 
 - vendor 
